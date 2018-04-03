@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">HW1</string>
+    <string name="app_name">Memory Game</string>
+    <string name="ac_entry_welcome">Welcome</string>
+    <string name="ac_entry_age">Please enter age</string>
+    <string name="ac_entry_name">Please enter name</string>
+    <string name="ac_entry_btn_start">Start New Game</string>
 </resources>
