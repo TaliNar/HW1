@@ -4,4 +4,8 @@
     <string name="ac_entry_age">Please enter age</string>
     <string name="ac_entry_name">Please enter name</string>
     <string name="ac_entry_btn_start">Start New Game</string>
+    <string name="ac_levels_btn_easy">Easy</string>
+    <string name="ac_levels_btn_medium">Medium</string>
+    <string name="ac_levels_btn_hard">Hard</string>
+    <string name="ac_levels_header">Hello %1$s!\nAge %2$s years\nSelect game level:</string>
 </resources>

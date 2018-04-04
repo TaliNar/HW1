@@ -33,6 +33,7 @@ public class EntryActivity extends AppCompatActivity{
     private void bindUI()
     {
         editTextName = findViewById(R.id.editTextName);
+        editTextName.requestFocus();
         editTextAge = findViewById(R.id.editTextAge);
         btnStart = findViewById(R.id.buttonStart);
     }
@@ -47,13 +48,6 @@ public class EntryActivity extends AppCompatActivity{
         if(editTextAge.getText().length() == 0) {
             editTextAge.setError("Please enter age");
             isValidInputs = false;
-        }
-        else {
-            int age = Integer.parseInt(editTextAge.toString());
-            if (age <= 0) {
-                editTextAge.setError("Age should be positive");
-                isValidInputs = false;
-            }
         }
         return isValidInputs;
     }
