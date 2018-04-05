@@ -1,5 +1,6 @@
 package com.example.tali.hw1;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,9 +9,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 public class LevelsActivity extends AppCompatActivity implements View.OnClickListener {
+    public static final String NUM_OF_CUBES = "NUM_OF_CUBES";
+    public static final String TIME = "TIME";
     private String name, age;
     private Button btn_easy, btn_medium, btn_hard;
     private TextView txt_view_header;
+    int num_of_cubes, time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +45,26 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.buttonEasy:
+                num_of_cubes = 4;
+                time = 30;
+                break;
+            case R.id.buttonMedium:
+                num_of_cubes = 16;
+                time = 45;
+                break;
+            case R.id.buttonHard:
+                num_of_cubes = 24;
+                time = 60;
+                break;
+        }
 
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(EntryActivity.NAME, name);
+        intent.putExtra(NUM_OF_CUBES, num_of_cubes);
+        intent.putExtra(TIME, time);
+        startActivity(intent);
     }
 }
