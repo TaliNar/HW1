@@ -12,14 +12,16 @@ import android.widget.ImageView;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    private Integer[] images;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, Integer[] images) {
         mContext = c;
+        this.images = images;
     }
 
     @Override
     public int getCount() {
-        return animals.length;
+        return images.length;
     }
 
     @Override
@@ -35,32 +37,20 @@ public class ImageAdapter extends BaseAdapter {
     @Override
     // create a new ImageSwitcher for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
+        MemoryImageView imageView;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
-            imageView = new ImageView(mContext);
+            imageView = new MemoryImageView(mContext);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setAdjustViewBounds(true);
         } else {
-            imageView = (ImageView) convertView;
+            imageView = (MemoryImageView) convertView;
         }
-
-        imageView.setImageResource(animals[position]);
+        imageView.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
+        imageView.setImageId(images[position]);
         return imageView;
 
     }
-
-    // references to our images
-    private Integer[] animals = {
-            R.drawable.awl, R.drawable.bear, R.drawable.bird,
-            R.drawable.cat, R.drawable.cow, R.drawable.deer,
-            R.drawable.fox, R.drawable.lion, R.drawable.monkey,
-            R.drawable.pig, R.drawable.rabbit, R.drawable.squirrel,
-            R.drawable.awl, R.drawable.bear, R.drawable.bird,
-            R.drawable.cat, R.drawable.cow, R.drawable.deer,
-            R.drawable.fox, R.drawable.lion, R.drawable.monkey,
-            R.drawable.pig, R.drawable.rabbit, R.drawable.squirrel,
-    };
 
 }

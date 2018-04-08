@@ -11,6 +11,9 @@ import android.widget.TextView;
 public class LevelsActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String NUM_OF_CUBES = "NUM_OF_CUBES";
     public static final String TIME = "TIME";
+    public static final int EASY_NUM_OF_CUBES = 2;
+    public static final int MEDIUM_NUM_OF_CUBES = 4;
+    public static final int HARD_NUM_OF_CUBES = 6;
     private String name, age;
     private Button btn_easy, btn_medium, btn_hard;
     private TextView txt_view_header;
@@ -48,15 +51,15 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         int id = view.getId();
         switch (id){
             case R.id.buttonEasy:
-                num_of_cubes = 4;
+                num_of_cubes = EASY_NUM_OF_CUBES;
                 time = 30;
                 break;
             case R.id.buttonMedium:
-                num_of_cubes = 16;
+                num_of_cubes = MEDIUM_NUM_OF_CUBES;
                 time = 45;
                 break;
             case R.id.buttonHard:
-                num_of_cubes = 24;
+                num_of_cubes = HARD_NUM_OF_CUBES;
                 time = 60;
                 break;
         }
