@@ -14,7 +14,9 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
     public static final int EASY_NUM_OF_CUBES = 2;
     public static final int MEDIUM_NUM_OF_CUBES = 4;
     public static final int HARD_NUM_OF_CUBES = 6;
-    private String name, age;
+    public static final String RESULT = "RESULT";
+    public static final int REQUEST_CODE = 1;
+    private String name, age, headerText;
     private Button btn_easy, btn_medium, btn_hard;
     private TextView txt_view_header;
     int num_of_cubes, time;
@@ -42,8 +44,8 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
 
         // set textView text with user input
         Resources res = getResources();
-        String text = String.format(res.getString(R.string.ac_levels_header), name, age);
-        txt_view_header.setText(text);
+        headerText = String.format(res.getString(R.string.ac_levels_header), name, age);
+        txt_view_header.setText(headerText);
     }
 
     @Override
@@ -68,6 +70,20 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         intent.putExtra(EntryActivity.NAME, name);
         intent.putExtra(NUM_OF_CUBES, num_of_cubes);
         intent.putExtra(TIME, time);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE){
+            String result = data.getStringExtra(LevelsActivity.RESULT);
+            if(!result.equals("")){
+                txt_view_header.setText(getString(R.string.ac_level_win_message));
+            }
+            else
+                txt_view_header.setText(headerText);
+        }
+    }
+
 }
