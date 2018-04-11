@@ -1,6 +1,5 @@
 package com.example.tali.hw1;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.util.*;
 import java.util.Arrays;
 
@@ -25,6 +23,9 @@ public class GameActivity extends AppCompatActivity {
     private TextView textViewName, textViewTimer;
     private ImageAdapter imageAdapter;
     private boolean timeIsUp = false;
+    private CountDownTimer countDownTimer;
+    private Runnable matchRunnable;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void startTimer()
     {
-        new CountDownTimer(maxTime * 1000, 1000) {
+        countDownTimer = new CountDownTimer(maxTime * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 int minutesLeft = (int)(millisUntilFinished/ 1000) / 60;
@@ -106,24 +107,32 @@ public class GameActivity extends AppCompatActivity {
         }.start();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Intent resIntent = new Intent();
+        setResult(RESULT_CANCELED, resIntent);
+        finish();
+    }
+
     private void checkForCouple(){
         final MemoryImageView imgView1 = (MemoryImageView)gridview.getChildAt(firstClick);
         final MemoryImageView imgView2 = (MemoryImageView)gridview.getChildAt(secondClick);
         firstClick = secondClick = -1;
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        handler = new Handler();
+        matchRunnable = new Runnable() {
             @Override
             public void run() {
-                if(imgView1.getImageId() != imgView2.getImageId()) {
+                if (imgView1.getImageId() != imgView2.getImageId()) {
                     imgView1.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
                     imgView1.setState(false);
                     imgView2.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
                     imgView2.setState(false);
-                }
-                else
+                } else
                     numOfMatches++;
             }
-        }, 1000);
+        };
+       handler.postDelayed(matchRunnable, 1000);
     }
 
     private Integer[] getImages()

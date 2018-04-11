@@ -76,7 +76,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE){
+        if (requestCode == REQUEST_CODE && resultCode != RESULT_CANCELED){
             String result = data.getStringExtra(LevelsActivity.RESULT);
             if(!result.equals("")){
                 txt_view_header.setText(getString(R.string.ac_level_win_message));
