@@ -16,6 +16,10 @@
         <item name="android:src">@drawable/ic_memory_game</item>
     </style>
 
+    <style name="MemoryImageView">
+        <item name="android:padding">1dp</item>
+    </style>
+
 
     <style name="button__text" >
         <item name="android:layout_width" >fill_parent</item>

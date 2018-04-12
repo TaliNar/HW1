@@ -1,5 +1,6 @@
 package com.example.tali.hw1;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Arrays;
 
@@ -61,8 +64,10 @@ public class GameActivity extends AppCompatActivity {
                     numClick++;
                     MemoryImageView img_view = (MemoryImageView) v;
                     img_view.setImageResource(img_view.getImageId());
+                    // Mark card
+                    //img_view.setCropToPadding(true);
+                    //img_view.setBackgroundColor(getResources().getColor(R.color.colorImageBorder));
                     img_view.setState(true);
-
                     if(numClick % 2 != 0)
                         firstClick = position;
                     else
@@ -80,8 +85,6 @@ public class GameActivity extends AppCompatActivity {
         String result = "";
         if(numOfMatches == sizeOfMatrix / 2)
             result = getString(R.string.ac_level_win_message);
-        // Show game end message
-        Toast.makeText(getApplicationContext(), R.string.ac_game_end_message, Toast.LENGTH_LONG).show();
         Intent resIntent = new Intent();
         resIntent.putExtra(LevelsActivity.RESULT, result);
         setResult(RESULT_OK, resIntent);
@@ -102,6 +105,8 @@ public class GameActivity extends AppCompatActivity {
             public void onFinish() {
                 timeIsUp = true;
                 textViewTimer.setText(String.format("%d:%02d", 0 , 0));
+                // Show game end message
+                Toast.makeText(getApplicationContext(), R.string.ac_game_end_message, Toast.LENGTH_LONG).show();
                 gameEnd();
             }
         }.start();
@@ -134,6 +139,11 @@ public class GameActivity extends AppCompatActivity {
                     imgView2.setState(false);
                 } else
                     numOfMatches++;
+                if(numOfMatches == sizeOfMatrix / 2){
+                    gameEnd();
+                }
+                //imgView1.setCropToPadding(false);
+                //imgView2.setCropToPadding(false);
             }
         };
        handler.postDelayed(matchRunnable, 1000);
@@ -148,8 +158,11 @@ public class GameActivity extends AppCompatActivity {
 
         int half_of_images = sizeOfMatrix/LevelsActivity.EASY_NUM_OF_CUBES;
         Integer[] images = new Integer[sizeOfMatrix];
-        System.arraycopy(all_animals, 0, images, 0, half_of_images);
-        System.arraycopy(all_animals, 0, images, half_of_images, half_of_images);
+        List shuffledList = Arrays.asList(all_animals);
+        Collections.shuffle(shuffledList);
+        Integer[] arrayFrom = (Integer[])shuffledList.toArray();
+        System.arraycopy(arrayFrom, 0, images, 0, half_of_images);
+        System.arraycopy(arrayFrom, 0, images, half_of_images, half_of_images);
         List list = Arrays.asList( images );
         Collections.shuffle(list);
         return (Integer[]) list.toArray();

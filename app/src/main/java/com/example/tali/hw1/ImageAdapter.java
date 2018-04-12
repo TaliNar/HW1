@@ -1,5 +1,6 @@
 package com.example.tali.hw1;
 
+import android.app.Application;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             imageView = new MemoryImageView(mContext);
+            imageView.setPadding(5,5,5,5);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setAdjustViewBounds(true);
