@@ -112,6 +112,10 @@ public class GameActivity extends AppCompatActivity {
         super.onPause();
         Intent resIntent = new Intent();
         setResult(RESULT_CANCELED, resIntent);
+        if(countDownTimer != null)
+            countDownTimer.cancel();
+        if(handler != null && matchRunnable != null)
+            handler.removeCallbacks(matchRunnable);
         finish();
     }
 
