@@ -20,8 +20,8 @@ public class GameActivity extends AppCompatActivity {
     private int numOfCubes, maxTime, numOfMatches = 0, sizeOfMatrix;
     private String name;
     private int numClick = 0;
-    private int firstClick = -1;
-    private int secondClick= -1;
+    private int firstClick = -1, secondClick= -1;
+    private int borderColor;
     private GridView gridview;
     private TextView textViewName, textViewTimer;
     private ImageAdapter imageAdapter;
@@ -29,6 +29,7 @@ public class GameActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     private Runnable matchRunnable;
     private Handler handler;
+    private Random rnd = new Random();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,28 +51,37 @@ public class GameActivity extends AppCompatActivity {
         textViewName.setText(name);
         textViewTimer = findViewById(R.id.textViewTimer);
         gridview = findViewById(R.id.gridView);
+
+        // In easy level, choose the number of columns to be 2
         if (numOfCubes == LevelsActivity.EASY_NUM_OF_CUBES){
             gridview.setNumColumns(numOfCubes);
             gridview.requestLayout();
         }
+
         final Integer[] images = getImages();
         imageAdapter = new ImageAdapter(this, images);
         gridview.setAdapter(imageAdapter);
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                if(!((MemoryImageView)v).getState() && !timeIsUp) { // the image is defaultImage
+                // The image is defaultImage and Timer is still running
+                if(!((MemoryImageView)v).getState() && !timeIsUp) {
                     numClick++;
                     MemoryImageView img_view = (MemoryImageView) v;
+                    // Show imageView animal picture
                     img_view.setImageResource(img_view.getImageId());
-                    // Mark card
-                    //img_view.setCropToPadding(true);
-                    //img_view.setBackgroundColor(getResources().getColor(R.color.colorImageBorder));
                     img_view.setState(true);
-                    if(numClick % 2 != 0)
+
+                    if(numClick % 2 != 0) {
                         firstClick = position;
-                    else
+                        // Mark card, each two cards marked with the same color
+                        borderColor = rnd.nextInt();
+                        setBorderColor(img_view, borderColor);
+                    }
+                    else {
                         secondClick = position;
+                        setBorderColor(img_view, borderColor);
+                    }
                     if(firstClick != -1 && secondClick != -1){
                         checkForCouple();
                     }
@@ -124,6 +134,12 @@ public class GameActivity extends AppCompatActivity {
         finish();
     }
 
+    /** Mark or remove marking**/
+    private void setBorderColor(MemoryImageView imageView, int borderColor){
+        imageView.setCropToPadding(true);
+        imageView.setBackgroundColor(borderColor);
+    }
+
     private void checkForCouple(){
         final MemoryImageView imgView1 = (MemoryImageView)gridview.getChildAt(firstClick);
         final MemoryImageView imgView2 = (MemoryImageView)gridview.getChildAt(secondClick);
@@ -132,6 +148,7 @@ public class GameActivity extends AppCompatActivity {
         matchRunnable = new Runnable() {
             @Override
             public void run() {
+                // If images are not equal return to default pictures
                 if (imgView1.getImageId() != imgView2.getImageId()) {
                     imgView1.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
                     imgView1.setState(false);
@@ -139,11 +156,12 @@ public class GameActivity extends AppCompatActivity {
                     imgView2.setState(false);
                 } else
                     numOfMatches++;
-                if(numOfMatches == sizeOfMatrix / 2){
+                if(numOfMatches == sizeOfMatrix / 2){ // User Won
                     gameEnd();
                 }
-                //imgView1.setCropToPadding(false);
-                //imgView2.setCropToPadding(false);
+                // Remove marking
+                setBorderColor(imgView1, getResources().getColor(R.color.colorBackGroundWhite));
+                setBorderColor(imgView2, getResources().getColor(R.color.colorBackGroundWhite));
             }
         };
        handler.postDelayed(matchRunnable, 1000);
@@ -151,24 +169,31 @@ public class GameActivity extends AppCompatActivity {
 
     private Integer[] getImages()
     {
+        // Decide size of matrix according to numOfCubes(from LevelsActivity)
         if(numOfCubes == LevelsActivity.HARD_NUM_OF_CUBES)
             sizeOfMatrix = numOfCubes * LevelsActivity.MEDIUM_NUM_OF_CUBES;
         else
             sizeOfMatrix = numOfCubes * numOfCubes;
 
-        int half_of_images = sizeOfMatrix/LevelsActivity.EASY_NUM_OF_CUBES;
-        Integer[] images = new Integer[sizeOfMatrix];
+        // Shuffle all animals pictures
         List shuffledList = Arrays.asList(all_animals);
         Collections.shuffle(shuffledList);
         Integer[] arrayFrom = (Integer[])shuffledList.toArray();
+
+        int half_of_images = sizeOfMatrix/LevelsActivity.EASY_NUM_OF_CUBES;
+        Integer[] images = new Integer[sizeOfMatrix];
+        // Copy half_of_images from all_animals array to images array
         System.arraycopy(arrayFrom, 0, images, 0, half_of_images);
+        // Copy the same images, to get pairs of animals
         System.arraycopy(arrayFrom, 0, images, half_of_images, half_of_images);
+
+        // Shuffle images array
         List list = Arrays.asList( images );
         Collections.shuffle(list);
         return (Integer[]) list.toArray();
     }
 
-    // references to our images
+    // References to animal images
     Integer[] all_animals = {
             R.drawable.awl, R.drawable.bear, R.drawable.bird,
             R.drawable.cat, R.drawable.cow, R.drawable.deer,

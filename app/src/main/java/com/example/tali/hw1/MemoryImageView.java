@@ -13,7 +13,6 @@ public class MemoryImageView extends AppCompatImageView{
 
     public MemoryImageView(Context context){
         super(context);
-        this.imageId = imageId;
     }
 
     public void setImageId (int img_id){
