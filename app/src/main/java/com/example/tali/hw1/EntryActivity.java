@@ -23,9 +23,10 @@ public class EntryActivity extends AppCompatActivity{
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                boolean isContinue = checkInputs();
+               /* boolean isContinue = checkInputs();
                 if(isContinue)
-                    goToLevelsActivity();
+                    goToLevelsActivity();*/
+               goToMapsActivity();
             }
         });
     }
@@ -60,6 +61,12 @@ public class EntryActivity extends AppCompatActivity{
         Intent intent = new Intent(this, LevelsActivity.class);
         intent.putExtra(NAME, name);
         intent.putExtra(AGE, age);
+        startActivity(intent);
+    }
+
+    private void goToMapsActivity()
+    {
+        Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 }

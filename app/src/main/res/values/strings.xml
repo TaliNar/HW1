@@ -10,4 +10,5 @@
     <string name="ac_levels_header">Hello %1$s!\nAge %2$s years\nSelect game level:</string>
     <string name="ac_game_end_message">"Time's up, game over!"</string>
     <string name="ac_level_win_message">"Congratulations, You Won!\nSelect game level:"</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
