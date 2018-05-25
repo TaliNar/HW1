@@ -23,10 +23,9 @@ public class EntryActivity extends AppCompatActivity{
         btnStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               /* boolean isContinue = checkInputs();
+               boolean isContinue = checkInputs();
                 if(isContinue)
-                    goToLevelsActivity();*/
-               goToMapsActivity();
+                    goToLevelsActivity();
             }
         });
     }
@@ -64,12 +63,4 @@ public class EntryActivity extends AppCompatActivity{
         startActivity(intent);
     }
 
-    private void goToMapsActivity()
-    {
-        String name = editTextName.getText().toString();
-
-        Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra(NAME, name);
-        startActivity(intent);
-    }
 }

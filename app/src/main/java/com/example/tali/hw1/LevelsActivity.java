@@ -17,7 +17,7 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
     public static final String RESULT = "RESULT";
     public static final int REQUEST_CODE = 1;
     private String name, age, headerText;
-    private Button btn_easy, btn_medium, btn_hard;
+    private Button btn_easy, btn_medium, btn_hard, btn_scores;
     private TextView txt_view_header;
     int num_of_cubes, time;
 
@@ -40,6 +40,8 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
         btn_medium.setOnClickListener(this);
         btn_hard = findViewById(R.id.buttonHard);
         btn_hard.setOnClickListener(this);
+        btn_scores = findViewById(R.id.buttonScores);
+        btn_scores.setOnClickListener(this);
         txt_view_header = findViewById(R.id.textViewHeader);
 
         // set textView text with user input
@@ -64,6 +66,9 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
                 num_of_cubes = HARD_NUM_OF_CUBES;
                 time = HARD_TIME;
                 break;
+            case R.id.buttonScores:
+                goToMapsActivity();
+                return;
         }
 
         Intent intent = new Intent(this, GameActivity.class);
@@ -84,6 +89,13 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
             else
                 txt_view_header.setText(headerText);
         }
+    }
+
+    private void goToMapsActivity()
+    {
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra(EntryActivity.NAME, name);
+        startActivity(intent);
     }
 
 }

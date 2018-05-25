@@ -1,11 +1,7 @@
 package com.example.tali.hw1.data;
 
-import android.content.Context;
 import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 
-import java.util.List;
 
 /**
  * Created by Tali on 25/05/2018.
