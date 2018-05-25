@@ -66,7 +66,10 @@ public class EntryActivity extends AppCompatActivity{
 
     private void goToMapsActivity()
     {
+        String name = editTextName.getText().toString();
+
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra(NAME, name);
         startActivity(intent);
     }
 }
