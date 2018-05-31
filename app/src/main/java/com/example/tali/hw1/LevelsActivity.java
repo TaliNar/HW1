@@ -67,7 +67,9 @@ public class LevelsActivity extends AppCompatActivity implements View.OnClickLis
                 time = HARD_TIME;
                 break;
             case R.id.buttonScores:
-                goToMapsActivity();
+                //goToMapsActivity();
+                Intent intent = new Intent(this, ScoreTable.class);
+                startActivity(intent);
                 return;
         }
 

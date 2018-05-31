@@ -11,4 +11,12 @@
     <string name="ac_game_end_message">"Time's up, game over!"</string>
     <string name="ac_level_win_message">"Congratulations, You Won!\nSelect game level:"</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="permission_rationale">Location permission is needed for core functionality</string>
+    <string name="permission_denied_explanation">Permission was denied, but is needed for core
+    functionality.</string>
+    <string name="settings">Settings</string>
+    <string name="no_location_detected">
+        No location detected. Make sure location is enabled on the device.
+    </string>
 </resources>

@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tali.hw1.GameActivity">
+    tools:context="com.example.tali.hw1.GameActivity"
+    android:id="@+id/game_activity_container">
+
 
     <GridView
         android:id="@+id/gridView"
