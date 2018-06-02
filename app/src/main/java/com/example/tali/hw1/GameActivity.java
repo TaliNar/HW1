@@ -51,7 +51,6 @@ public class GameActivity extends AppCompatActivity{
     protected Location mLastLocation;
     private static final String TAG = GameActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-    private PlayerBuilder pb;
 
     /**
      * Provides the entry point to the Fused Location Provider API.
@@ -69,7 +68,6 @@ public class GameActivity extends AppCompatActivity{
         name = data.getString(EntryActivity.NAME);
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        pb = new PlayerBuilder(this);
 
         bindUI();
         startTimer();
@@ -145,7 +143,8 @@ public class GameActivity extends AppCompatActivity{
     private void addScore(){
 
         double score = sizeOfMatrix * (maxTime - timeLeft);
-        pb.addPlayer(name, score, mLastLocation);
+        PlayerBuilder pb = new PlayerBuilder(this, name, score, mLastLocation);
+        new Thread(pb).start();
     }
 
     private void startTimer()
@@ -237,7 +236,6 @@ public class GameActivity extends AppCompatActivity{
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             mLastLocation = task.getResult();
-                           // pb.setLocation(mLastLocation);
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
                             showSnackbar(getString(R.string.no_location_detected));

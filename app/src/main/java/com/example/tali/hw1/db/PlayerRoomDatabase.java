@@ -52,9 +52,6 @@ public abstract class PlayerRoomDatabase extends RoomDatabase {
         @Override
         protected Void doInBackground(final Void... params) {
             //mDao.deleteAll();
-            ToDo: // Add player that won game
-            //Player player = new Player()
-            //mDao.insert(player);
             return null;
         }
     }

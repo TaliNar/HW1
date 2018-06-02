@@ -23,7 +23,12 @@ public interface PlayerDao {
     @Query("DELETE FROM Player")
     void deleteAll();
 
-    @Query("SELECT * from Player ORDER BY score ASC")
+    @Query("SELECT * from Player")
     LiveData<List<Player>> getAllPlayers();
 
+    @Query("SELECT * from Player WHERE score = (SELECT min(score) from Player)")
+    Player getPlayerWithLowestScore();
+
+    @Query("SELECT count(name) FROM player")
+    int getNumOfPlayers();
 }

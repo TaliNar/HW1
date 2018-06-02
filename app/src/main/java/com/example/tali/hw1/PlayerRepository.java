@@ -26,6 +26,18 @@ public class PlayerRepository {
     }
 
 
+    public void delete(Player player){
+        mplayerDao.delete(player);
+    }
+
+    public Player getPlayerWithLowestScore(){
+        return mplayerDao.getPlayerWithLowestScore();
+    }
+
+    public int getNumOfPlayers(){
+        return mplayerDao.getNumOfPlayers();
+    }
+
     public void insert (Player player) {
         new insertAsyncTask(mplayerDao).execute(player);
     }

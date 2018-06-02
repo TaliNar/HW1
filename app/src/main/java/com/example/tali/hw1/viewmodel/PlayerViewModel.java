@@ -21,6 +21,18 @@ public class PlayerViewModel extends AndroidViewModel {
         mAllPlayers = mPlayerRepository.getAllPlayers();
     }
 
+    public void delete(Player player){
+        mPlayerRepository.delete(player);
+    }
+
+    public Player getPlayerWithLowestScore(){
+        return mPlayerRepository.getPlayerWithLowestScore();
+    }
+
+    public int getNumOfPlayers(){
+        return mPlayerRepository.getNumOfPlayers();
+    }
+
     public LiveData<List<Player>> getAllPlayers() { return mAllPlayers; }
 
     public void insert(Player player) { mPlayerRepository.insert(player); }

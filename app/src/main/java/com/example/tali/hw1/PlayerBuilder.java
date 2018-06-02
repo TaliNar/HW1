@@ -15,13 +15,18 @@ import com.example.tali.hw1.viewmodel.PlayerViewModel;
 import java.io.IOException;
 import java.util.List;
 
-public class PlayerBuilder {
+public class PlayerBuilder implements Runnable{
     PlayerViewModel mPlayerViewModel;
     Context mContext;
+    String name;
+    Location location;
+    double score;
 
-
-    public PlayerBuilder(Context context){
+    public PlayerBuilder(Context context, String name, double score, Location location){
         this.mContext = context;
+        this.name = name;
+        this.score = score;
+        this.location = location;
     }
 
     public Address convertToAddress(Location location){
@@ -36,10 +41,19 @@ public class PlayerBuilder {
         return null;
     }
 
-    public void addPlayer(String name, double score, Location location){
+    @Override
+    public void run() {
         mPlayerViewModel = ViewModelProviders.of((FragmentActivity)mContext).get(PlayerViewModel.class);
         Address address = convertToAddress(location);
-        mPlayerViewModel.insert(new Player(name, score, address));
+        if(mPlayerViewModel.getNumOfPlayers() == 10){
+            Player lowPlayer = mPlayerViewModel.getPlayerWithLowestScore();
+            if(lowPlayer.getScore() < score) {
+                mPlayerViewModel.delete(lowPlayer);
+                mPlayerViewModel.insert(new Player(name, score, address));
+            }
+        }
+        else{
+            mPlayerViewModel.insert(new Player(name, score, address));
+        }
     }
-
 }
