@@ -38,6 +38,14 @@ public class PlayerRepository {
         return mplayerDao.getNumOfPlayers();
     }
 
+    public List<Player> getListOfPlayers(){
+        return mplayerDao.getListOfPlayers();
+    }
+
+    public Player getPlayer(int id){
+        return mplayerDao.getPlayer(id);
+    }
+
     public void insert (Player player) {
         new insertAsyncTask(mplayerDao).execute(player);
     }

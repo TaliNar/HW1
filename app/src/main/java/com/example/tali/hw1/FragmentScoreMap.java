@@ -1,62 +1,97 @@
 package com.example.tali.hw1;
 
 import android.Manifest;
+import android.app.Activity;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.example.tali.hw1.db.Player;
+import com.example.tali.hw1.viewmodel.PlayerViewModel;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import static android.content.Context.LOCATION_SERVICE;
 
+public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
     private GoogleMap mMap;
     private LocationManager mLocationManager;
     private LocationListener mLocationListener;
+    private PlayerViewModel playerViewModel;
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 10;
     public static final int LOCATION_UPDATE_MIN_TIME = 5000;
     private Marker currentLocationMarker = null;
+    private SupportMapFragment mapFragment;
     private String name;
+    View view;
 
+    public FragmentScoreMap() {
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        playerViewModel = ViewModelProviders.of(this).get(PlayerViewModel.class);
+    }
 
-        Bundle data = getIntent().getExtras();
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.activity_maps, container, false);
+        Bundle data = getActivity().getIntent().getExtras();
         name = data.getString(EntryActivity.NAME);
 
+        //mLastLocation = getArguments().getParcelable("last Location");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().
+                findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
-        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mLocationManager = (LocationManager) getActivity().getSystemService(LOCATION_SERVICE);
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                currentLocationMarker.remove();
+                if(location.getAccuracy() <= 50)
+                    mLocationManager.removeUpdates(mLocationListener);
+                if(currentLocationMarker != null)
+                    currentLocationMarker.remove();
                 addMarkerCurrentLocation(location);
             }
 
@@ -76,6 +111,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startActivity(intent);
             }
         };
+
+        return view;
     }
 
     @Override
@@ -91,7 +128,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public Location requestLocation() {
         Location location = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
                         Manifest.permission.ACCESS_FINE_LOCATION,
                         Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -105,12 +144,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return location;
     }
 
-    private void addMarker(Player player) {
+/*    public void addMarkers(Player player) {
         Address address = player.getAddress();
         LatLng playerLocation = new LatLng(address.getLatitude(), address.getLongitude());
         mMap.addMarker(new MarkerOptions().position(playerLocation).title(player.toString()));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(playerLocation, 12));
-    }
+    }*/
 
     private void addMarkerCurrentLocation(Location location) {
         LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -119,18 +158,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         requestLocation();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
         mLocationManager.removeUpdates(mLocationListener);
     }
@@ -149,18 +188,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.clear();
-        Player me = null;
+        //Player me = null;
         Location currentLocation = requestLocation();
         if(currentLocation != null) {
-            Address address = convertToAddress(currentLocation);
-            me = new Player(name, 100, address);
+            //Address address = convertToAddress(currentLocation);
+            //me = new Player(name, 100, address);
             addMarkerCurrentLocation(currentLocation);
         }
-        showPlayers(me);
+        showPlayers();
     }
 
     private Address convertToAddress(Location location){
-        Geocoder geocoder = new Geocoder(this);
+        Geocoder geocoder = new Geocoder(getContext());
         try {
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
             return addresses.get(0);
@@ -171,8 +210,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return null;
     }
 
-    private void showPlayers(Player player) {
-        addMarker(player);
+    private void showPlayers() {
+        // start the AsyncTask, passing the Activity context
+        // in to a custom constructor
+        new MyTask(getActivity(), playerViewModel, mMap).execute();
+    }
+
+    private static class MyTask extends AsyncTask<Void, Void, List<Player>> {
+
+        private WeakReference<Activity> contextReference;
+        private PlayerViewModel playerViewModel;
+        private GoogleMap mMap;
+
+        // only retain a weak reference to the activity
+        public MyTask(Activity activity, PlayerViewModel playerViewModel, GoogleMap mMap) {
+            contextReference = new WeakReference<>(activity);
+            this.playerViewModel = playerViewModel;
+            this.mMap = mMap;
+        }
+
+        @Override
+        protected List<Player> doInBackground(Void... params) {
+            List<Player> players = playerViewModel.getListOfPlayers();
+            return players;
+        }
+
+        @Override
+        protected void onPostExecute(List<Player> players) {
+
+            // get a reference to the activity if it is still there
+            Activity activity = contextReference.get();
+            if (activity == null || activity.isFinishing()) return;
+
+            // modify the UI
+            for(int i = 0; i < players.size(); i++) {
+                Player currentPlayer = players.get(i);
+                Address address = currentPlayer.getAddress();
+                LatLng playerLocation = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(playerLocation).title(currentPlayer.toString()));
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(playerLocation, 12));
+            }
+        }
     }
 
 }
+
+
+

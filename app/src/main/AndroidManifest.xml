@@ -36,22 +36,22 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
         <meta-data
-            tools:replace="android:value"
             android:name="android.support.VERSION"
-            android:value="26.1.0" />
-
+            android:value="26.1.0"
+            tools:replace="android:value" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key"
-            tools:replace="android:value"/>
+            tools:replace="android:value" />
+
+        <service
+            android:name=".MyLocationProvider"
+            android:label="location service" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" />
-
-        <activity
-            android:name=".ScoreTable"/>
-        <service android:name=".MyLocationProvider" android:label="location service" />
+            android:name=".ScoreActivity"
+            android:label="@string/title_activity_score"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

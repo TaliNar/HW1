@@ -33,6 +33,14 @@ public class PlayerViewModel extends AndroidViewModel {
         return mPlayerRepository.getNumOfPlayers();
     }
 
+    public List<Player> getListOfPlayers(){
+        return mPlayerRepository.getListOfPlayers();
+    }
+
+    public Player getPlayer(int id){
+        return mPlayerRepository.getPlayer(id);
+    }
+
     public LiveData<List<Player>> getAllPlayers() { return mAllPlayers; }
 
     public void insert(Player player) { mPlayerRepository.insert(player); }

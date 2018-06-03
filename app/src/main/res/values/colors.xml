@@ -5,4 +5,5 @@
     <color name="colorAccent">#b20056</color>
     <color name="colorBackGroundWhite">#FFFFFF</color>
     <color name="colorImageBorder">#ff6c9d</color>
+    <color name="tabIndicatorColor">#2d2d2d</color>
 </resources>

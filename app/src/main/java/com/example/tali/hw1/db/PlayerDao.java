@@ -26,8 +26,14 @@ public interface PlayerDao {
     @Query("SELECT * from Player")
     LiveData<List<Player>> getAllPlayers();
 
+    @Query("SELECT * from Player")
+    List<Player> getListOfPlayers();
+
     @Query("SELECT * from Player WHERE score = (SELECT min(score) from Player)")
     Player getPlayerWithLowestScore();
+
+    @Query("SELECT * FROM player where id = :id")
+    Player getPlayer(int id);
 
     @Query("SELECT count(name) FROM player")
     int getNumOfPlayers();
