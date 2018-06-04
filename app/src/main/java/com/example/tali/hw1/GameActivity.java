@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationProvider;
@@ -13,6 +14,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.tali.hw1.db.Player;
 import com.example.tali.hw1.viewmodel.PlayerViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -31,6 +34,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.Arrays;
 
@@ -38,7 +43,7 @@ import tyrantgit.explosionfield.ExplosionField;
 
 public class GameActivity extends AppCompatActivity{
     public static final String SCORE = "SCORE";
-    private static final long ANIMATION_DURATION = 2000;
+    private static final long ANIMATION_DURATION = 3000;
     private int numOfCubes, maxTime, numOfMatches = 0, sizeOfMatrix;
     private long timeLeft;
     private String name;
@@ -137,8 +142,7 @@ public class GameActivity extends AppCompatActivity{
     private void gameEnd(){
         if(numOfMatches == sizeOfMatrix / 2) {
             addScore();
-            String result = getString(R.string.ac_level_win_message);
-            returnToLevelsActivity(result);
+            winAnimation();
         }
         else {
             looseAnimation();
@@ -146,10 +150,28 @@ public class GameActivity extends AppCompatActivity{
     }
 
     private void returnToLevelsActivity(String result){
-        Intent resIntent = new Intent();
-        resIntent.putExtra(LevelsActivity.RESULT, result);
-        setResult(RESULT_OK, resIntent);
-        finish();
+        Handler waitAnimationHandler = new Handler();
+        class AnimationRunnable implements Runnable{
+            String result;
+            AnimationRunnable(String result){this.result = result;}
+            @Override
+            public void run() {
+                Intent resIntent = new Intent();
+                resIntent.putExtra(LevelsActivity.RESULT, result);
+                setResult(RESULT_OK, resIntent);
+                finish();
+            }
+        }
+        AnimationRunnable runnable = new AnimationRunnable(result);
+        waitAnimationHandler.postDelayed(runnable,ANIMATION_DURATION);
+    }
+
+    private void winAnimation(){
+        gridview.setVisibility(View.GONE);
+        LottieAnimationView lottieAnimationView = findViewById(R.id.animation_view);
+        lottieAnimationView.setVisibility(View.VISIBLE);
+        lottieAnimationView.playAnimation();
+        returnToLevelsActivity(getString(R.string.ac_level_win_message));
     }
 
     private void looseAnimation(){
@@ -157,15 +179,7 @@ public class GameActivity extends AppCompatActivity{
             MemoryImageView child = (MemoryImageView)gridview.getChildAt(i);
             explosionField.explode(child);
         }
-        Handler waitAnimationHandler = new Handler();
-        Runnable waitAnimationRunnable = new Runnable(){
-
-            @Override
-            public void run() {
-               returnToLevelsActivity("");
-            }
-        };
-        waitAnimationHandler.postDelayed(waitAnimationRunnable,ANIMATION_DURATION);
+        returnToLevelsActivity("");
     }
 
     private void addScore(){
