@@ -34,8 +34,11 @@ import com.google.android.gms.tasks.Task;
 import java.util.*;
 import java.util.Arrays;
 
+import tyrantgit.explosionfield.ExplosionField;
+
 public class GameActivity extends AppCompatActivity{
     public static final String SCORE = "SCORE";
+    private static final long ANIMATION_DURATION = 2000;
     private int numOfCubes, maxTime, numOfMatches = 0, sizeOfMatrix;
     private long timeLeft;
     private String name;
@@ -51,6 +54,7 @@ public class GameActivity extends AppCompatActivity{
     protected Location mLastLocation;
     private static final String TAG = GameActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+    private ExplosionField explosionField;
 
     /**
      * Provides the entry point to the Fused Location Provider API.
@@ -88,6 +92,8 @@ public class GameActivity extends AppCompatActivity{
         textViewName = findViewById(R.id.textViewName);
         textViewName.setText(name);
         textViewTimer = findViewById(R.id.textViewTimer);
+
+        explosionField = ExplosionField.attach2Window(this);
         gridview = findViewById(R.id.gridView);
 
         // In easy level, choose the number of columns to be 2
@@ -129,15 +135,37 @@ public class GameActivity extends AppCompatActivity{
     }
 
     private void gameEnd(){
-        String result = "";
         if(numOfMatches == sizeOfMatrix / 2) {
             addScore();
-            result = getString(R.string.ac_level_win_message);
+            String result = getString(R.string.ac_level_win_message);
+            returnToLevelsActivity(result);
         }
+        else {
+            looseAnimation();
+        }
+    }
+
+    private void returnToLevelsActivity(String result){
         Intent resIntent = new Intent();
         resIntent.putExtra(LevelsActivity.RESULT, result);
         setResult(RESULT_OK, resIntent);
         finish();
+    }
+
+    private void looseAnimation(){
+        for(int i = 0; i < gridview.getChildCount(); i++){
+            MemoryImageView child = (MemoryImageView)gridview.getChildAt(i);
+            explosionField.explode(child);
+        }
+        Handler waitAnimationHandler = new Handler();
+        Runnable waitAnimationRunnable = new Runnable(){
+
+            @Override
+            public void run() {
+               returnToLevelsActivity("");
+            }
+        };
+        waitAnimationHandler.postDelayed(waitAnimationRunnable,ANIMATION_DURATION);
     }
 
     private void addScore(){
