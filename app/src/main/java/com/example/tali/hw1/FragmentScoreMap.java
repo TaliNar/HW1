@@ -55,10 +55,9 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
     private LocationListener mLocationListener;
     private PlayerViewModel playerViewModel;
     public static final int LOCATION_UPDATE_MIN_DISTANCE = 10;
+    public static final int GOOD_ACCURACY = 30;
     public static final int LOCATION_UPDATE_MIN_TIME = 5000;
     private Marker currentLocationMarker = null;
-    private SupportMapFragment mapFragment;
-    private String name;
     View view;
 
     public FragmentScoreMap() {
@@ -75,9 +74,6 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.activity_maps, container, false);
         Bundle data = getActivity().getIntent().getExtras();
-        name = data.getString(EntryActivity.NAME);
-
-        //mLastLocation = getArguments().getParcelable("last Location");
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().
@@ -88,7 +84,7 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
         mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                if(location.getAccuracy() <= 50)
+                if(location.getAccuracy() <= GOOD_ACCURACY)
                     mLocationManager.removeUpdates(mLocationListener);
                 if(currentLocationMarker != null)
                     currentLocationMarker.remove();
@@ -144,13 +140,6 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
         return location;
     }
 
-/*    public void addMarkers(Player player) {
-        Address address = player.getAddress();
-        LatLng playerLocation = new LatLng(address.getLatitude(), address.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(playerLocation).title(player.toString()));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(playerLocation, 12));
-    }*/
-
     private void addMarkerCurrentLocation(Location location) {
         LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         currentLocationMarker = mMap.addMarker(new MarkerOptions().position(currentLocation).title("You are here"));
@@ -188,26 +177,11 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.clear();
-        //Player me = null;
         Location currentLocation = requestLocation();
         if(currentLocation != null) {
-            //Address address = convertToAddress(currentLocation);
-            //me = new Player(name, 100, address);
             addMarkerCurrentLocation(currentLocation);
         }
         showPlayers();
-    }
-
-    private Address convertToAddress(Location location){
-        Geocoder geocoder = new Geocoder(getContext());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
-            return addresses.get(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void showPlayers() {
@@ -243,12 +217,13 @@ public class FragmentScoreMap extends Fragment implements OnMapReadyCallback{
             if (activity == null || activity.isFinishing()) return;
 
             // modify the UI
-            for(int i = 0; i < players.size(); i++) {
+           for(int i = 0; i < players.size(); i++) {
                 Player currentPlayer = players.get(i);
                 Address address = currentPlayer.getAddress();
-                LatLng playerLocation = new LatLng(address.getLatitude(), address.getLongitude());
-                mMap.addMarker(new MarkerOptions().position(playerLocation).title(currentPlayer.toString()));
-                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(playerLocation, 12));
+                if(address != null) {
+                    LatLng playerLocation = new LatLng(address.getLatitude(), address.getLongitude());
+                    mMap.addMarker(new MarkerOptions().position(playerLocation).title(currentPlayer.toString()));
+                }
             }
         }
     }

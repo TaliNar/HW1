@@ -37,6 +37,10 @@ public class PlayerViewModel extends AndroidViewModel {
         return mPlayerRepository.getListOfPlayers();
     }
 
+    public void deleteAll(){
+        mPlayerRepository.deleteAll();
+    }
+
     public Player getPlayer(int id){
         return mPlayerRepository.getPlayer(id);
     }

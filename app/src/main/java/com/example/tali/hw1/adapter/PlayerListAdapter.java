@@ -2,6 +2,7 @@ package com.example.tali.hw1.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,10 @@ public class PlayerListAdapter extends RecyclerView.Adapter<PlayerListAdapter.Pl
             Player current = mPlayers.get(position);
             holder.textViewName.setText(current.getName());
             holder.textViewScore.setText(current.getScore().toString());
-            holder.textViewAddress.setText(current.getAddress().getAddressLine(0));
+            if(current.getAddress() != null) {
+                holder.textViewAddress.setText(current.getAddress().getAddressLine(0));
+            }else
+                Log.w("PlayerListAdapter", "address is null");
         }
     }
 

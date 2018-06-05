@@ -6,4 +6,5 @@
     <color name="colorBackGroundWhite">#FFFFFF</color>
     <color name="colorImageBorder">#ff6c9d</color>
     <color name="tabIndicatorColor">#2d2d2d</color>
+    <color name="BLACK">#000</color>
 </resources>

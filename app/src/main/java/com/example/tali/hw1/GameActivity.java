@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -185,8 +186,10 @@ public class GameActivity extends AppCompatActivity{
     private void addScore(){
 
         double score = sizeOfMatrix * (maxTime - timeLeft);
-        PlayerBuilder pb = new PlayerBuilder(this, name, score, mLastLocation);
-        new Thread(pb).start();
+        if(mLastLocation != null) {
+            PlayerBuilder pb = new PlayerBuilder(this, name, score, mLastLocation);
+            new Thread(pb).start();
+        }
     }
 
     private void startTimer()
@@ -280,7 +283,9 @@ public class GameActivity extends AppCompatActivity{
                             mLastLocation = task.getResult();
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
-                            showSnackbar(getString(R.string.no_location_detected));
+                            //showSnackbar(getString(R.string.no_location_detected));
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(intent);
                         }
                     }
                 });
@@ -294,7 +299,13 @@ public class GameActivity extends AppCompatActivity{
     private void showSnackbar(final String text) {
         View container = findViewById(R.id.game_activity_container);
         if (container != null) {
-            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(container, text, Snackbar.LENGTH_LONG)
+                    .setAction("Action", null);
+            View sbView = snackbar.getView();
+            TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(getResources().getColor(R.color.BLACK));
+            //sbView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.BLACK));
+            snackbar.show();
         }
     }
 
@@ -307,10 +318,15 @@ public class GameActivity extends AppCompatActivity{
      */
     private void showSnackbar(final int mainTextStringId, final int actionStringId,
                               View.OnClickListener listener) {
-        Snackbar.make(findViewById(android.R.id.content),
-                getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(actionStringId), listener).show();
+        View container = findViewById(R.id.game_activity_container);
+        if (container != null) {
+            Snackbar snackbar = Snackbar.make(container, mainTextStringId, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(getString(actionStringId), listener);
+            View sbView = snackbar.getView();
+            TextView textView = sbView.findViewById(android.support.design.R.id.snackbar_text);
+            textView.setTextColor(getResources().getColor(R.color.BLACK));
+            snackbar.show();
+        }
     }
 
     /**
