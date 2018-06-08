@@ -1,4 +1,4 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.ui;
 
 
 import android.arch.lifecycle.Observer;
@@ -6,14 +6,14 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.tali.hw1.adapter.PlayerListAdapter;
+import com.example.tali.hw1.R;
+import com.example.tali.hw1.adapters.PlayerListAdapter;
 import com.example.tali.hw1.db.Player;
 import com.example.tali.hw1.viewmodel.PlayerViewModel;
 

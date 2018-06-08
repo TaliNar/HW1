@@ -1,4 +1,4 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.tali.hw1.R;
 import com.example.tali.hw1.db.Player;
 import com.example.tali.hw1.viewmodel.PlayerViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;

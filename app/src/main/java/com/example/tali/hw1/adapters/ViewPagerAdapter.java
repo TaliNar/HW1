@@ -1,4 +1,4 @@
-package com.example.tali.hw1.adapter;
+package com.example.tali.hw1.adapters;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;

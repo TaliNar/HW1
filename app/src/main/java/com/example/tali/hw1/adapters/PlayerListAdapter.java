@@ -1,4 +1,4 @@
-package com.example.tali.hw1.adapter;
+package com.example.tali.hw1.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

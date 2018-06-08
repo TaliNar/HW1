@@ -1,4 +1,4 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.db;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;

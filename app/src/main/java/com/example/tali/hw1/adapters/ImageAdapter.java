@@ -1,11 +1,11 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.adapters;
 
-import android.app.Application;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
+
+import com.example.tali.hw1.ui.MemoryImageView;
 
 /**
  * Created by Tali on 06/04/2018.

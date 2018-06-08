@@ -1,4 +1,4 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.viewmodel;
 
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;

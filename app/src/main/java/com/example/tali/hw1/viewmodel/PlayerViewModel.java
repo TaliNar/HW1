@@ -5,7 +5,7 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
-import com.example.tali.hw1.PlayerRepository;
+import com.example.tali.hw1.db.PlayerRepository;
 import com.example.tali.hw1.db.Player;
 
 import java.util.List;

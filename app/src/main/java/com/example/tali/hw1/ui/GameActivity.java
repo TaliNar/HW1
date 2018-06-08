@@ -1,21 +1,21 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.ui;
 import android.Manifest;
-import android.arch.lifecycle.ViewModelProviders;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.location.Address;
 import android.location.Location;
-import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,31 +28,30 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.example.tali.hw1.db.Player;
-import com.example.tali.hw1.viewmodel.PlayerViewModel;
+import com.example.tali.hw1.BuildConfig;
+import com.example.tali.hw1.services.TiltMeasureService;
+import com.example.tali.hw1.viewmodel.PlayerBuilder;
+import com.example.tali.hw1.R;
+import com.example.tali.hw1.adapters.ImageAdapter;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.Arrays;
 
 import tyrantgit.explosionfield.ExplosionField;
 
 public class GameActivity extends AppCompatActivity{
-    public static final String SCORE = "SCORE";
     private static final long ANIMATION_DURATION = 3000;
     private int numOfCubes, maxTime, numOfMatches = 0, sizeOfMatrix;
     private long timeLeft;
     private String name;
     private int numClick = 0, firstClick = -1, secondClick= -1, borderColor;
     private GridView gridview;
-    private TextView textViewName, textViewTimer;
-    private ImageAdapter imageAdapter;
-    private boolean timeIsUp = false;
+    private TextView textViewTimer;
+    private boolean timeIsUp = false, mBound = false;
     private CountDownTimer countDownTimer;
     private Runnable matchRunnable;
     private Handler handler;
@@ -61,6 +60,8 @@ public class GameActivity extends AppCompatActivity{
     private static final String TAG = GameActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private ExplosionField explosionField;
+    private TiltMeasureService mTiltMeasureService;
+    private Intent tiltServiceIntent;
 
     /**
      * Provides the entry point to the Fused Location Provider API.
@@ -79,6 +80,9 @@ public class GameActivity extends AppCompatActivity{
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        // register to receive broadcast from receiver of service
+        registerReceiver(broadcastReceiver, new IntentFilter("UPDATE_UI"));
+
         bindUI();
         startTimer();
     }
@@ -86,6 +90,13 @@ public class GameActivity extends AppCompatActivity{
     @Override
     protected void onStart() {
         super.onStart();
+
+        // Bind to TiltMeasureService
+        tiltServiceIntent = new Intent(this, TiltMeasureService.class);
+        bindService(tiltServiceIntent, mConnection, BIND_AUTO_CREATE);
+        // Start TiltMeasureService
+        startService(tiltServiceIntent);
+
         if (!checkPermissions()) {
             requestPermissions();
         } else {
@@ -95,7 +106,7 @@ public class GameActivity extends AppCompatActivity{
 
     private void bindUI()
     {
-        textViewName = findViewById(R.id.textViewName);
+        TextView textViewName = findViewById(R.id.textViewName);
         textViewName.setText(name);
         textViewTimer = findViewById(R.id.textViewTimer);
 
@@ -109,7 +120,7 @@ public class GameActivity extends AppCompatActivity{
         }
 
         final Integer[] images = getImages();
-        imageAdapter = new ImageAdapter(this, images);
+        ImageAdapter imageAdapter = new ImageAdapter(this, images);
         gridview.setAdapter(imageAdapter);
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -215,8 +226,17 @@ public class GameActivity extends AppCompatActivity{
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(mConnection);
+        stopService(tiltServiceIntent);
+        mBound = false;
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
+        stopService(tiltServiceIntent);
         Intent resIntent = new Intent();
         setResult(RESULT_CANCELED, resIntent);
         if(countDownTimer != null)
@@ -229,7 +249,49 @@ public class GameActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+        startService(tiltServiceIntent);
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get TiltMeasureService instance
+            TiltMeasureService.TiltMeasureBinder binder = (TiltMeasureService.TiltMeasureBinder) service;
+            mTiltMeasureService = binder.getService();
+            mBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
+    public static class MyBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // update ui
+            context.sendBroadcast(new Intent("UPDATE_UI"));
+        }
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            for (int i = 0; i < gridview.getChildCount(); i++) {
+                    MemoryImageView child = (MemoryImageView) gridview.getChildAt(i);
+                    if (child.getState()) {  // cube is open, not default picture
+                        child.setImageResource(child.DEFAULT_IMAGE_ID);
+                        child.setState(false);
+                        break;
+                    }
+            }
+        }
+    };
+
 
     /** Mark or remove marking**/
     private void setBorderColor(MemoryImageView imageView, int borderColor){

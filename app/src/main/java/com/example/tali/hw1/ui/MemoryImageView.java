@@ -1,14 +1,17 @@
-package com.example.tali.hw1;
+package com.example.tali.hw1.ui;
 import android.content.Context;
 import android.support.v7.widget.AppCompatImageView;
+
+import com.example.tali.hw1.R;
 
 /**
  * Created by Tali on 08/04/2018.
  */
 
 public class MemoryImageView extends AppCompatImageView{
+
+    public final static int DEFAULT_IMAGE_ID = R.drawable.pink_button;
     private int imageId;
-    final static int DEFAULT_IMAGE_ID = R.drawable.pink_button;
     private boolean state = false; // MemoryImageView is with default image
 
     public MemoryImageView(Context context){
