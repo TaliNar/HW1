@@ -18,7 +18,7 @@ import com.example.tali.hw1.ui.GameActivity;
 
 public class TiltMeasureService extends IntentService {
 
-    final static float THRESHOLD = (float) 2.5;
+    final static float THRESHOLD = (float) 3;
 
     // Binder given to clients
     private final IBinder mBinder = new TiltMeasureBinder();
