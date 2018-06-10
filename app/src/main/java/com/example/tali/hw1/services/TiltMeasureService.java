@@ -11,15 +11,14 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.example.tali.hw1.ui.GameActivity;
 
 
 public class TiltMeasureService extends IntentService {
 
-    final static int THRESHOLD = 2;
-    public static final String MY_NOTIFICATION = "com.example.tali.hw1.MY_NOTIFICATION";
+    final static float THRESHOLD = (float) 2.5;
 
     // Binder given to clients
     private final IBinder mBinder = new TiltMeasureBinder();
@@ -44,6 +43,7 @@ public class TiltMeasureService extends IntentService {
     private float initialAzimuth;
     private float initialPitch;
     private float initialRoll;
+    private boolean needToStop = false;
 
     public TiltMeasureService(){
         super("TiltMeasureService");
@@ -54,6 +54,8 @@ public class TiltMeasureService extends IntentService {
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
+
+
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
@@ -79,14 +81,13 @@ public class TiltMeasureService extends IntentService {
                     SensorManager.getOrientation(outGravity, values);
 
                     if(counter == 0){
-                        initialAzimuth = values[0] * 57.2957795f;
-                        initialPitch =values[1] * 57.2957795f;
-                        initialRoll = values[2] * 57.2957795f;
+                        initialAzimuth = values[0]; //* 57.2957795f;
+                        initialPitch =values[1]; //* 57.2957795f;
+                        initialRoll = values[2]; //* 57.2957795f;
                     }else {
-
-                        azimuth = values[0] * 57.2957795f;
-                        pitch = values[1] * 57.2957795f;
-                        roll = values[2] * 57.2957795f;
+                        azimuth = values[0]; //* 57.2957795f;
+                        pitch = values[1]; //* 57.2957795f;
+                        roll = values[2]; //* 57.2957795f;
                     }
                     mags = null;
                     accels = null;
@@ -94,6 +95,9 @@ public class TiltMeasureService extends IntentService {
                 }
 
                 checkTilt();
+                if(needToStop){
+                    onDestroy();
+                }
             }
 
             @Override
@@ -110,8 +114,14 @@ public class TiltMeasureService extends IntentService {
     }
 
     private void checkTilt() {
-        if(Math.abs(azimuth - initialAzimuth) > THRESHOLD || 
-                Math.abs(pitch - initialPitch) > THRESHOLD || Math.abs(roll - initialRoll) > THRESHOLD){
+        float azimuth_change = Math.abs(azimuth) - Math.abs(initialAzimuth);
+        float pitch_change = Math.abs(pitch) - Math.abs(initialPitch);
+        float roll_change = Math.abs(roll) - Math.abs(initialRoll);
+
+        if(azimuth_change > THRESHOLD || azimuth_change < -THRESHOLD ||
+                pitch_change > THRESHOLD || pitch_change < -THRESHOLD ||
+                roll_change > THRESHOLD || roll_change < - THRESHOLD){
+
             // send Broadcast to update the UI
             Intent updateUiIntent = new Intent(getApplicationContext(), GameActivity.MyBroadcastReceiver.class);
             sendBroadcast(updateUiIntent);
@@ -125,5 +135,14 @@ public class TiltMeasureService extends IntentService {
         }
     }
 
+    public void stop(){
+        needToStop = true;
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        sensorManager.unregisterListener(sensorEventListener);
+        this.stopSelf();
+    }
 }

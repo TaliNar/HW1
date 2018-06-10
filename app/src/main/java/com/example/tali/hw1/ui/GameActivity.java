@@ -62,6 +62,7 @@ public class GameActivity extends AppCompatActivity{
     private ExplosionField explosionField;
     private TiltMeasureService mTiltMeasureService;
     private Intent tiltServiceIntent;
+    private Stack<MemoryImageView> openCubes;
 
     /**
      * Provides the entry point to the Fused Location Provider API.
@@ -80,8 +81,10 @@ public class GameActivity extends AppCompatActivity{
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // register to receive broadcast from receiver of service
+        // register to receive broadcast from receiver of TiltMeasure service
         registerReceiver(broadcastReceiver, new IntentFilter("UPDATE_UI"));
+
+        openCubes = new Stack<>();
 
         bindUI();
         startTimer();
@@ -94,6 +97,7 @@ public class GameActivity extends AppCompatActivity{
         // Bind to TiltMeasureService
         tiltServiceIntent = new Intent(this, TiltMeasureService.class);
         bindService(tiltServiceIntent, mConnection, BIND_AUTO_CREATE);
+
         // Start TiltMeasureService
         startService(tiltServiceIntent);
 
@@ -152,6 +156,8 @@ public class GameActivity extends AppCompatActivity{
     }
 
     private void gameEnd(){
+        mBound = false;
+
         if(numOfMatches == sizeOfMatrix / 2) {
             addScore();
             winAnimation();
@@ -228,15 +234,17 @@ public class GameActivity extends AppCompatActivity{
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(mConnection);
-        stopService(tiltServiceIntent);
-        mBound = false;
     }
+
 
     @Override
     protected void onPause() {
         super.onPause();
+        unregisterReceiver(broadcastReceiver);
+        unbindService(mConnection);
         stopService(tiltServiceIntent);
+        mTiltMeasureService.stop();
+        mBound = false;
         Intent resIntent = new Intent();
         setResult(RESULT_CANCELED, resIntent);
         if(countDownTimer != null)
@@ -250,9 +258,10 @@ public class GameActivity extends AppCompatActivity{
     protected void onResume() {
         super.onResume();
         startService(tiltServiceIntent);
+        registerReceiver(broadcastReceiver, new IntentFilter("UPDATE_UI"));
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    //** Defines callbacks for service binding, passed to bindService() *//*
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -278,16 +287,25 @@ public class GameActivity extends AppCompatActivity{
         }
     }
 
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for (int i = 0; i < gridview.getChildCount(); i++) {
-                    MemoryImageView child = (MemoryImageView) gridview.getChildAt(i);
-                    if (child.getState()) {  // cube is open, not default picture
-                        child.setImageResource(child.DEFAULT_IMAGE_ID);
-                        child.setState(false);
-                        break;
-                    }
+            if (!openCubes.isEmpty() && numOfMatches != (sizeOfMatrix / 2) ) {
+                MemoryImageView imageView1, imageView2;
+                imageView1 = openCubes.pop();
+                imageView2 = openCubes.pop();
+
+                imageView1.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
+                imageView1.setState(false);
+                imageView2.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
+                imageView2.setState(false);
+
+                // Remove marking
+                setBorderColor(imageView1, getResources().getColor(R.color.colorBackGroundWhite));
+                setBorderColor(imageView1, getResources().getColor(R.color.colorBackGroundWhite));
+
+                numOfMatches--;
             }
         }
     };
@@ -313,8 +331,11 @@ public class GameActivity extends AppCompatActivity{
                     imgView1.setState(false);
                     imgView2.setImageResource(MemoryImageView.DEFAULT_IMAGE_ID);
                     imgView2.setState(false);
-                } else
+                } else {
                     numOfMatches++;
+                    openCubes.push(imgView1);
+                    openCubes.push(imgView2);
+                }
                 if(numOfMatches == sizeOfMatrix / 2){ // User Won
                     gameEnd();
                 }
@@ -323,7 +344,7 @@ public class GameActivity extends AppCompatActivity{
                 setBorderColor(imgView2, getResources().getColor(R.color.colorBackGroundWhite));
             }
         };
-       handler.postDelayed(matchRunnable, 1000);
+       handler.postDelayed(matchRunnable, 500);
     }
 
 
