@@ -53,8 +53,6 @@ public class GameActivity extends AppCompatActivity{
     private TextView textViewTimer;
     private boolean timeIsUp = false, mBound = false;
     private CountDownTimer countDownTimer;
-    private Runnable matchRunnable;
-    private Handler handler;
     private Random rnd = new Random();
     protected Location mLastLocation;
     private static final String TAG = GameActivity.class.getSimpleName();
@@ -231,11 +229,6 @@ public class GameActivity extends AppCompatActivity{
         }.start();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
 
     @Override
     protected void onPause() {
@@ -249,8 +242,6 @@ public class GameActivity extends AppCompatActivity{
         setResult(RESULT_CANCELED, resIntent);
         if(countDownTimer != null)
             countDownTimer.cancel();
-        if(handler != null && matchRunnable != null)
-            handler.removeCallbacks(matchRunnable);
         finish();
     }
 
@@ -321,8 +312,8 @@ public class GameActivity extends AppCompatActivity{
         final MemoryImageView imgView1 = (MemoryImageView)gridview.getChildAt(firstClick);
         final MemoryImageView imgView2 = (MemoryImageView)gridview.getChildAt(secondClick);
         firstClick = secondClick = -1;
-        handler = new Handler();
-        matchRunnable = new Runnable() {
+        Handler handler = new Handler();
+        Runnable matchRunnable = new Runnable() {
             @Override
             public void run() {
                 // If images are not equal return to default pictures

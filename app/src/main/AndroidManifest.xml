@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.LevelsActivity" />
-        <activity android:name=".ui.GameActivity" />
+        <activity android:name=".ui.GameActivity"
+            android:screenOrientation="sensorPortrait"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
